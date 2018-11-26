@@ -1,15 +1,15 @@
 'use strict';
 
 var NUM_OFFERS = 8;
-var AVATAR = ['01', '02', '03', '04', '05', '06', '07', '08'];
-var TITLE = ['Большая уютная квартира', 'Маленькая неуютная квартира',
+var AVATARS = ['01', '02', '03', '04', '05', '06', '07', '08'];
+var TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира',
   'Огромный прекрасный дворец', 'Маленький ужасный дворец',
   'Красивый гостевой домик', 'Некрасивый негостеприимный домик',
   'Уютное бунгало далеко от моря', 'Неутное бунгало по колено в воде'
 ];
-var TYPE = ['palace', 'flat', 'house', 'bungalo'];
-var CHECKIN = ['12:00', '13:00', '14:00'];
-var CHECKOUT = ['12:00', '13:00', '14:00'];
+var TYPES = ['palace', 'flat', 'house', 'bungalo'];
+var CHECKINS = ['12:00', '13:00', '14:00'];
+var CHECKOUTS = ['12:00', '13:00', '14:00'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
@@ -17,13 +17,11 @@ var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
 ];
 
 var map = document.querySelector('.map');
-map.classList.remove('map--faded');
-var MAP_WIDTH = map.offsetWidth;
 
-var pinListElement = map.querySelector('.map__pins');
-var mapFilterContainer = map.querySelector('.map__filters-container');
-var mapPinTemplate = document.querySelector('#pin').content.querySelector('.map__pin');
-var cardTemplate = document.querySelector('#card').content.querySelector('.map__card');
+// Функция, активирующая блок карты
+var activateMap = function () {
+  map.classList.remove('map--faded');
+};
 
 // Функция, возвращающая случайное число в пределах отрезка [minLimit, maxLimit]
 var getRandom = function (minLimit, maxLimit) {
@@ -53,10 +51,12 @@ var shuffleArray = function (arr) {
 
 // Функция, создающая массив объектов
 var makeApartment = function (numOffers) {
+  var MAP_WIDTH = map.offsetWidth;
+
   var apartments = [];
 
-  var shuffleAvatarArr = shuffleArray(AVATAR);
-  var shuffleTitleArr = shuffleArray(TITLE);
+  var shuffleAvatarsArr = shuffleArray(AVATARS);
+  var shuffleTitlesArr = shuffleArray(TITLES);
 
   for (var i = 0; i < numOffers; i++) {
     var locationX = getRandom(0, MAP_WIDTH);
@@ -64,18 +64,18 @@ var makeApartment = function (numOffers) {
 
     apartments[i] = {
       author: {
-        avatar: 'img/avatars/user' + shuffleAvatarArr[i] + '.png'
+        avatar: 'img/avatars/user' + shuffleAvatarsArr[i] + '.png'
       },
 
       offer: {
-        title: shuffleTitleArr[i],
+        title: shuffleTitlesArr[i],
         address: locationX + ', ' + locationY,
         price: getRandom(0, 1000) * 1000,
-        type: getRandomElement(TYPE),
+        type: getRandomElement(TYPES),
         rooms: getRandom(1, 5),
         guests: getRandom(1, 10),
-        checkin: getRandomElement(CHECKIN),
-        checkout: getRandomElement(CHECKOUT),
+        checkin: getRandomElement(CHECKINS),
+        checkout: getRandomElement(CHECKOUTS),
         features: shuffleArray(FEATURES).slice(0, getRandom(0, FEATURES.length - 1)),
         description: '',
         photos: shuffleArray(PHOTOS)
@@ -94,9 +94,12 @@ var makeApartment = function (numOffers) {
 
 // Функция, наполняющая шаблон пинов на карте информацией
 var renderPin = function (apartment) {
-  var pinElement = mapPinTemplate.cloneNode(true);
+  var HALF_WIDTH_PIN = 25;
+  var HEIGHT_PIN = 70;
 
-  pinElement.style = 'left: ' + (apartment.location.x - 25) + 'px; top: ' + (apartment.location.y - 70) + 'px';
+  var pinElement = document.querySelector('#pin').content.querySelector('.map__pin').cloneNode(true);
+
+  pinElement.style = 'left: ' + (apartment.location.x - HALF_WIDTH_PIN) + 'px; top: ' + (apartment.location.y - HEIGHT_PIN) + 'px';
   pinElement.querySelector('img').src = apartment.author.avatar;
   pinElement.querySelector('img').alt = apartment.offer.title;
 
@@ -118,7 +121,7 @@ var chooseTypeApartment = function (apartment) {
 
 // Функция, наполняющая DOM-элемент по шаблону
 var renderCard = function (apartment) {
-  var cardElement = cardTemplate.cloneNode(true);
+  var cardElement = document.querySelector('#card').content.querySelector('.map__card').cloneNode(true);
 
   cardElement.querySelector('.popup__avatar').src = apartment.author.avatar;
   cardElement.querySelector('.popup__title').textContent = apartment.offer.title;
@@ -152,6 +155,7 @@ var renderCard = function (apartment) {
 
 // Функция, создающая DOM-элемент с пинами объявлений на карте
 var makePinsBlock = function (apartmentArr) {
+  var pinListElement = map.querySelector('.map__pins');
   var fragmentPins = document.createDocumentFragment();
 
   apartmentArr.forEach(function (elem) {
@@ -162,6 +166,7 @@ var makePinsBlock = function (apartmentArr) {
 
 // функция, создающая DOM-элемент с карточкой объявления
 var makeCardBlock = function (apartment) {
+  var mapFilterContainer = map.querySelector('.map__filters-container');
   var fragmentCard = document.createDocumentFragment();
 
   fragmentCard.appendChild(renderCard(apartment));
@@ -169,6 +174,8 @@ var makeCardBlock = function (apartment) {
 };
 
 // Блок выполнения
+activateMap();
+
 var apartmentOffers = makeApartment(NUM_OFFERS);
 
 makePinsBlock(apartmentOffers);
