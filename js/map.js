@@ -1,5 +1,6 @@
 'use strict';
 
+var ESC_KEYCODE = 27;
 var NUM_OFFERS = 8;
 var AVATARS = ['01', '02', '03', '04', '05', '06', '07', '08'];
 var TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира',
@@ -17,10 +18,16 @@ var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
 ];
 
 var map = document.querySelector('.map');
+var adForm = document.querySelector('.ad-form');
 
 // Функция, активирующая блок карты
 var activateMap = function () {
   map.classList.remove('map--faded');
+};
+
+// Функция, активирующая блок параметров
+var activateNotice = function () {
+  adForm.classList.remove('ad-form--disabled');
 };
 
 // Функция, возвращающая случайное число в пределах отрезка [minLimit, maxLimit]
@@ -103,6 +110,11 @@ var renderPin = function (apartment) {
   pinElement.querySelector('img').src = apartment.author.avatar;
   pinElement.querySelector('img').alt = apartment.offer.title;
 
+  pinElement.addEventListener('click', function () {
+    deleteCard();
+    makeCardBlock(apartment);
+  });
+
   return pinElement;
 };
 
@@ -123,6 +135,10 @@ var chooseTypeApartment = function (apartment) {
 var renderCard = function (apartment) {
   var cardElement = document.querySelector('#card').content.querySelector('.map__card').cloneNode(true);
 
+  document.addEventListener('keydown', function (evt) {
+    onCardEscPress(evt);
+  });
+  cardElement.querySelector('.popup__close').addEventListener('click', deleteCard);
   cardElement.querySelector('.popup__avatar').src = apartment.author.avatar;
   cardElement.querySelector('.popup__title').textContent = apartment.offer.title;
   cardElement.querySelector('.popup__text--address').textContent = apartment.offer.address;
@@ -164,7 +180,7 @@ var makePinsBlock = function (apartmentArr) {
   pinListElement.appendChild(fragmentPins);
 };
 
-// функция, создающая DOM-элемент с карточкой объявления
+// Функция, создающая DOM-элемент с карточкой объявления
 var makeCardBlock = function (apartment) {
   var mapFilterContainer = map.querySelector('.map__filters-container');
   var fragmentCard = document.createDocumentFragment();
@@ -173,10 +189,69 @@ var makeCardBlock = function (apartment) {
   map.insertBefore(fragmentCard, mapFilterContainer);
 };
 
-// Блок выполнения
-activateMap();
+// Функция, деактивирующая поля формы
+var makeDisableFieldset = function () {
+  document.querySelectorAll('fieldset').forEach(function (elem) {
+    elem.disabled = true;
+  });
 
+  document.querySelectorAll('select').forEach(function (elem) {
+    elem.disabled = true;
+  });
+};
+
+// Функция, активирующая поля формы
+var makeEnableFieldset = function () {
+  document.querySelectorAll('fieldset').forEach(function (elem) {
+    elem.disabled = false;
+  });
+
+  document.querySelectorAll('select').forEach(function (elem) {
+    elem.disabled = false;
+  });
+
+  activateMap();
+  activateNotice();
+};
+
+// Функция для рассчета положения пина
+var calculatePosition = function (pin) {
+  var MAIN_PIN_HEIGHT = 84;
+  var MAIN_PIN_WIDTH = 62;
+
+  var posLeft = pin.offsetTop + MAIN_PIN_HEIGHT;
+  var posTop = pin.offsetLeft + MAIN_PIN_WIDTH / 2;
+
+  adForm.querySelector('#address').value = posLeft + ', ' + posTop;
+};
+
+// Функция, старую карточку
+var deleteCard = function () {
+  var oldCard = map.querySelector('.map__card');
+
+  if (oldCard) {
+    map.removeChild(oldCard);
+  }
+};
+
+var onCardEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    deleteCard();
+  }
+};
+
+var onMouseUpMainPin = function () {
+  var mainPin = document.querySelector('.map__pin--main');
+
+  mainPin.addEventListener('mouseup', function () {
+    makeEnableFieldset();
+    calculatePosition(mainPin);
+    makePinsBlock(apartmentOffers);
+  });
+};
+
+// Блок выполнения
 var apartmentOffers = makeApartment(NUM_OFFERS);
 
-makePinsBlock(apartmentOffers);
-makeCardBlock(apartmentOffers[0]);
+makeDisableFieldset();
+onMouseUpMainPin();
