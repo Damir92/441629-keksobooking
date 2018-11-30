@@ -135,10 +135,6 @@ var chooseTypeApartment = function (apartment) {
 var renderCard = function (apartment) {
   var cardElement = document.querySelector('#card').content.querySelector('.map__card').cloneNode(true);
 
-  document.addEventListener('keydown', function (evt) {
-    onCardEscPress(evt);
-  });
-  cardElement.querySelector('.popup__close').addEventListener('click', deleteCard);
   cardElement.querySelector('.popup__avatar').src = apartment.author.avatar;
   cardElement.querySelector('.popup__title').textContent = apartment.offer.title;
   cardElement.querySelector('.popup__text--address').textContent = apartment.offer.address;
@@ -183,14 +179,16 @@ var makePinsBlock = function (apartmentArr) {
 // Функция, создающая DOM-элемент с карточкой объявления
 var makeCardBlock = function (apartment) {
   var mapFilterContainer = map.querySelector('.map__filters-container');
-  var fragmentCard = document.createDocumentFragment();
+  var newCard = renderCard(apartment);
 
-  fragmentCard.appendChild(renderCard(apartment));
-  map.insertBefore(fragmentCard, mapFilterContainer);
+  map.insertBefore(newCard, mapFilterContainer);
+
+  document.addEventListener('keydown', onCardEscPress);
+  document.querySelector('.popup__close').addEventListener('click', deleteCard);
 };
 
 // Функция, деактивирующая поля формы
-var makeDisableFieldset = function () {
+var makePageEnactive = function () {
   document.querySelectorAll('fieldset').forEach(function (elem) {
     elem.disabled = true;
   });
@@ -201,7 +199,7 @@ var makeDisableFieldset = function () {
 };
 
 // Функция, активирующая поля формы
-var makeEnableFieldset = function () {
+var makePageActive = function () {
   document.querySelectorAll('fieldset').forEach(function (elem) {
     elem.disabled = false;
   });
@@ -231,6 +229,8 @@ var deleteCard = function () {
 
   if (oldCard) {
     map.removeChild(oldCard);
+    document.removeEventListener('keydown', onCardEscPress);
+    document.querySelector('.popup__close').removeEventListener('click', deleteCard);
   }
 };
 
@@ -240,18 +240,19 @@ var onCardEscPress = function (evt) {
   }
 };
 
-var onMouseUpMainPin = function () {
+var addHandlerToMainPin = function () {
   var mainPin = document.querySelector('.map__pin--main');
 
   mainPin.addEventListener('mouseup', function () {
-    makeEnableFieldset();
+    makePageActive();
     calculatePosition(mainPin);
     makePinsBlock(apartmentOffers);
   });
 };
 
 // Блок выполнения
+calculatePosition(document.querySelector('.map__pin--main'));
 var apartmentOffers = makeApartment(NUM_OFFERS);
 
-makeDisableFieldset();
-onMouseUpMainPin();
+makePageEnactive();
+addHandlerToMainPin();
