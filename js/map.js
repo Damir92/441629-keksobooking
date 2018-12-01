@@ -208,8 +208,18 @@ var makePageActive = function () {
     elem.disabled = false;
   });
 
+  // document.querySelectorAll('#room_number').forEach(function (elem) {
+  //   elem.disabled = true;
+  // });
+
   activateMap();
   activateNotice();
+
+  document.querySelector('#title').addEventListener('invalid', showTitleValidityMessage);
+  document.querySelector('#title').addEventListener('input', changeTitleValidityMessage);
+  document.querySelector('#price').addEventListener('invalid', showPriceValidityMessage);
+  document.querySelector('#price').addEventListener('input', changePriceValidityMessage);
+  document.querySelector('#room_number').addEventListener('input', changeRoomsBlock);
 };
 
 // Функция для рассчета положения пина
@@ -228,9 +238,9 @@ var deleteCard = function () {
   var oldCard = map.querySelector('.map__card');
 
   if (oldCard) {
-    map.removeChild(oldCard);
     document.removeEventListener('keydown', onCardEscPress);
     document.querySelector('.popup__close').removeEventListener('click', deleteCard);
+    map.removeChild(oldCard);
   }
 };
 
@@ -248,6 +258,67 @@ var addHandlerToMainPin = function () {
     calculatePosition(mainPin);
     makePinsBlock(apartmentOffers);
   });
+};
+
+var showTitleValidityMessage = function () {
+  var noticeTitle = document.querySelector('#title');
+  if (noticeTitle.validity.tooShort) {
+    noticeTitle.setCustomValidity('Заголовок должен содержать не менее 30-ти символов');
+  } else if (noticeTitle.validity.tooLong) {
+    noticeTitle.setCustomValidity('Заголовок не должен превышать 100 символов');
+  } else if (noticeTitle.validity.valueMissing) {
+    noticeTitle.setCustomValidity('Обязательное поле');
+  } else {
+    noticeTitle.setCustomValidity('');
+  }
+};
+
+var changeTitleValidityMessage = function (evt) {
+  var target = evt.target;
+  if (target.value.length < 30) {
+    target.setCustomValidity('Заголовок должен содержать не менее 30-ти символов! Сейчас символов: ' + target.value.length);
+  } else {
+    target.setCustomValidity('');
+  }
+};
+
+var showPriceValidityMessage = function () {
+  var noticePrice = document.querySelector('#price');
+  if (noticePrice.validity.rangeUnderflow) {
+    noticePrice.setCustomValidity('Настолько дешёвого жилья не бывает! Минимальная стоимость: 1 000');
+  } else if (noticePrice.validity.rangeOverflow) {
+    noticePrice.setCustomValidity('Кажется, у Вас в стоимости многовато цифр! Максимальная стоимость 1 000 000');
+  } else if (noticePrice.validity.valueMissing) {
+    noticePrice.setCustomValidity('Обязательное поле');
+  } else {
+    noticePrice.setCustomValidity('');
+  }
+};
+
+var changePriceValidityMessage = function (evt) {
+  var target = evt.target;
+  if (target.value < 1000) {
+    target.setCustomValidity('Настолько дешёвого жилья не бывает! Накиньте еще ' + (1000 - target.value));
+  } else {
+    target.setCustomValidity('');
+  }
+};
+
+var changeRoomsBlock = function () {
+  var rooms = document.querySelector('#room_number');
+  var guests = document.querySelector('#capacity');
+  guests.value = '';
+
+  if (rooms.value === '100') {
+    guests.querySelectorAll('option').forEach(function (elem) {
+      elem.disabled = (elem.value === '0') ? false : true;
+    });
+  } else {
+    guests.querySelectorAll('option').forEach(function (elem) {
+      elem.disabled = (elem.value <= rooms.value) ? false : true;
+    });
+    guests.querySelector('[value="0"]').disabled = true;
+  }
 };
 
 // Блок выполнения
