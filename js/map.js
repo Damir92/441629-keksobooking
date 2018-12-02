@@ -220,6 +220,9 @@ var makePageActive = function () {
   document.querySelector('#price').addEventListener('invalid', showPriceValidityMessage);
   document.querySelector('#price').addEventListener('input', changePriceValidityMessage);
   document.querySelector('#room_number').addEventListener('input', changeRoomsBlock);
+  document.querySelector('#type').addEventListener('input', watchTypeNotice);
+  document.querySelector('#timein').addEventListener('input', watchTimeIn);
+  document.querySelector('#timeout').addEventListener('input', watchTimeOut);
 };
 
 // Функция для рассчета положения пина
@@ -285,7 +288,7 @@ var changeTitleValidityMessage = function (evt) {
 var showPriceValidityMessage = function () {
   var noticePrice = document.querySelector('#price');
   if (noticePrice.validity.rangeUnderflow) {
-    noticePrice.setCustomValidity('Настолько дешёвого жилья не бывает! Минимальная стоимость: 1 000');
+    noticePrice.setCustomValidity('Минимальная стоимость: ' + document.querySelector('#price').min);
   } else if (noticePrice.validity.rangeOverflow) {
     noticePrice.setCustomValidity('Кажется, у Вас в стоимости многовато цифр! Максимальная стоимость 1 000 000');
   } else if (noticePrice.validity.valueMissing) {
@@ -318,6 +321,43 @@ var changeRoomsBlock = function () {
       elem.disabled = (elem.value <= rooms.value) ? false : true;
     });
     guests.querySelector('[value="0"]').disabled = true;
+  }
+};
+
+var watchTypeNotice = function () {
+  var type = document.querySelector('#type');
+  var price = document.querySelector('#price');
+
+  if (type.value === 'bungalo') {
+    price.min = 0;
+    price.placeholder = 0;
+  } else if (type.value === 'flat') {
+    price.min = 1000;
+    price.placeholder = 1000;
+  } else if (type.value === 'house') {
+    price.min = 5000;
+    price.placeholder = 5000;
+  } else if (type.value === 'palace') {
+    price.min = 10000;
+    price.placeholder = 10000;
+  }
+};
+
+var watchTimeIn = function () {
+  var timeIn = document.querySelector('#timein');
+  var timeOut = document.querySelector('#timeout');
+
+  if (timeIn.value) {
+    timeOut.value = timeIn.value;
+  }
+};
+
+var watchTimeOut = function () {
+  var timeIn = document.querySelector('#timein');
+  var timeOut = document.querySelector('#timeout');
+
+  if (timeOut.value) {
+    timeIn.value = timeOut.value;
   }
 };
 
