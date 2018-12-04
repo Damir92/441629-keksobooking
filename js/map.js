@@ -1,7 +1,6 @@
 'use strict';
 
 var ESC_KEYCODE = 27;
-var NUM_OFFERS = 8;
 var AVATARS = ['01', '02', '03', '04', '05', '06', '07', '08'];
 var TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира',
   'Огромный прекрасный дворец', 'Маленький ужасный дворец',
@@ -17,17 +16,36 @@ var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
 ];
 
+var firstMovePin = true;
 var map = document.querySelector('.map');
 var adForm = document.querySelector('.ad-form');
 
 // Функция, активирующая блок карты
 var activateMap = function () {
-  map.classList.remove('map--faded');
+  if (map.classList.contains('map--faded')) {
+    map.classList.remove('map--faded');
+  }
 };
 
 // Функция, активирующая блок параметров
 var activateNotice = function () {
-  adForm.classList.remove('ad-form--disabled');
+  if (adForm.classList.contains('ad-form--disabled')) {
+    adForm.classList.remove('ad-form--disabled');
+  }
+};
+
+// Функция, деактивирующая блок карты
+var deactivateMap = function () {
+  if (!map.classList.contains('map--faded')) {
+    map.classList.add('map--faded');
+  }
+};
+
+// Функция, деактивирующая блок параметров
+var deactivateNotice = function () {
+  if (!adForm.classList.contains('ad-form--disabled')) {
+    adForm.classList.add('ad-form--disabled');
+  }
 };
 
 // Функция, возвращающая случайное число в пределах отрезка [minLimit, maxLimit]
@@ -54,6 +72,17 @@ var shuffleArray = function (arr) {
   }
 
   return newArray;
+};
+
+// Функция для рассчета положения пина
+var calculatePosition = function (pin) {
+  var MAIN_PIN_HEIGHT = 84;
+  var MAIN_PIN_WIDTH = 62;
+
+  var posLeft = pin.offsetTop + MAIN_PIN_HEIGHT;
+  var posTop = pin.offsetLeft + MAIN_PIN_WIDTH / 2;
+
+  adForm.querySelector('#address').value = posLeft + ', ' + posTop;
 };
 
 // Функция, создающая массив объектов
@@ -208,10 +237,6 @@ var makePageActive = function () {
     elem.disabled = false;
   });
 
-  // document.querySelectorAll('#room_number').forEach(function (elem) {
-  //   elem.disabled = true;
-  // });
-
   activateMap();
   activateNotice();
 
@@ -223,17 +248,7 @@ var makePageActive = function () {
   document.querySelector('#type').addEventListener('input', watchTypeNotice);
   document.querySelector('#timein').addEventListener('input', watchTimeIn);
   document.querySelector('#timeout').addEventListener('input', watchTimeOut);
-};
-
-// Функция для рассчета положения пина
-var calculatePosition = function (pin) {
-  var MAIN_PIN_HEIGHT = 84;
-  var MAIN_PIN_WIDTH = 62;
-
-  var posLeft = pin.offsetTop + MAIN_PIN_HEIGHT;
-  var posTop = pin.offsetLeft + MAIN_PIN_WIDTH / 2;
-
-  adForm.querySelector('#address').value = posLeft + ', ' + posTop;
+  document.querySelector('.ad-form__reset').addEventListener('click', resetPage);
 };
 
 // Функция, старую карточку
@@ -251,16 +266,6 @@ var onCardEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
     deleteCard();
   }
-};
-
-var addHandlerToMainPin = function () {
-  var mainPin = document.querySelector('.map__pin--main');
-
-  mainPin.addEventListener('mouseup', function () {
-    makePageActive();
-    calculatePosition(mainPin);
-    makePinsBlock(apartmentOffers);
-  });
 };
 
 var showTitleValidityMessage = function () {
@@ -361,9 +366,38 @@ var watchTimeOut = function () {
   }
 };
 
+var resetPage = function (evt) {
+  evt.preventDefault();
+
+  makePageEnactive();
+  document.querySelector('.map__pin--main').style.left = '570px';
+  document.querySelector('.map__pin--main').style.top = '375px';
+  document.querySelectorAll('form').forEach(function (elem) {
+    elem.reset();
+  });
+  document.querySelectorAll('.map__pin').forEach(function (elem) {
+    if (!elem.classList.contains('map__pin--main')) {
+      map.querySelector('.map__pins').removeChild(elem);
+    }
+  });
+  deactivateMap();
+  deactivateNotice();
+  firstMovePin = true;
+
+  calculatePosition(document.querySelector('.map__pin--main'));
+};
+
+window.maps = {
+  adForm: adForm,
+  calculatePosition: calculatePosition,
+  makePageActive: makePageActive,
+  makePinsBlock: makePinsBlock,
+  makeApartment: makeApartment,
+  map: map,
+  firstMovePin: firstMovePin
+};
+
 // Блок выполнения
-calculatePosition(document.querySelector('.map__pin--main'));
-var apartmentOffers = makeApartment(NUM_OFFERS);
+// calculatePosition(document.querySelector('.map__pin--main'));
 
 makePageEnactive();
-addHandlerToMainPin();
