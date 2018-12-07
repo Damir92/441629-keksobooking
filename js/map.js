@@ -4,16 +4,34 @@
 
   var mainMap = window.data.mainMap;
   var makePinsBlock = window.pin.makePinsBlock;
-  var apartmentOffers = window.data.apartmentOffers;
+  // var apartmentOffers = window.data.apartmentOffers;
   var deleteCard = window.card.deleteCard;
   var calculatePosition = window.pin.calculatePosition;
   var adForm = document.querySelector('.ad-form');
+  var load = window.backend.load;
+  var save = window.backend.save;
+
+  var apartmentOffers;
 
   // Функция, активирующая карту и форму
   var makePageActive = function () {
-    if (mainMap.classList.contains('map--faded')) {
-      mainMap.classList.remove('map--faded');
-      makePinsBlock(apartmentOffers);
+    if (apartmentOffers) {
+      if (mainMap.classList.contains('map--faded')) {
+        mainMap.classList.remove('map--faded');
+        makePinsBlock(apartmentOffers);
+      }
+    } else {
+      load(function (apartments) {
+        apartmentOffers = apartments;
+        window.apartmentOffers = apartmentOffers;
+
+        if (mainMap.classList.contains('map--faded')) {
+          mainMap.classList.remove('map--faded');
+          makePinsBlock(apartmentOffers);
+        }
+      }, function (errorText) {
+        showError(errorText);
+      });
     }
 
     if (adForm.classList.contains('ad-form--disabled')) {
@@ -76,6 +94,17 @@
     window.data.firstMovePin = true;
   };
 
+  var showError = function (errorText) {
+    var errorElement = document.querySelector('#error').content.querySelector('.error').cloneNode(true);
+    var errorMessage = document.createElement('p');
+
+    errorMessage.textContent = errorText;
+    errorMessage.style.color = 'white';
+
+    errorElement.insertBefore(errorMessage, errorElement.querySelector('.error__button'));
+    document.querySelector('main').appendChild(errorElement);
+  };
+
   window.map = {
     adForm: adForm,
     makePageActive: makePageActive,
@@ -83,5 +112,15 @@
   };
 
   makePageEnactive();
+
+  adForm.addEventListener('submit', function (evt) {
+    save(new FormData(adForm), function () {
+      adForm.reset();
+      calculatePosition(document.querySelector('.map__pin--main'));
+    }, function (errorText) {
+      showError(errorText);
+    });
+    evt.preventDefault();
+  });
 
 })();

@@ -31,6 +31,7 @@
     pinElement.addEventListener('click', function () {
       deleteCard();
       makeCardBlock(apartment);
+      pinElement.classList.add('map__pin--active');
     });
 
     return pinElement;
@@ -42,7 +43,9 @@
     var fragmentPins = document.createDocumentFragment();
 
     apartmentArr.forEach(function (elem) {
-      fragmentPins.appendChild(renderPin(elem));
+      if (elem.offer) {
+        fragmentPins.appendChild(renderPin(elem));
+      }
     });
     pinListElement.appendChild(fragmentPins);
   };

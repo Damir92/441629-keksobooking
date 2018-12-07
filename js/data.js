@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var NUM_OFFERS = 8;
+  // var NUM_OFFERS = 8;
   var AVATARS = ['01', '02', '03', '04', '05', '06', '07', '08'];
   var TITLES = [
     'Большая уютная квартира',
@@ -95,13 +95,14 @@
     return apartments;
   };
 
-  var apartmentOffers = makeApartment(NUM_OFFERS);
+  // var apartmentOffers = makeApartment(NUM_OFFERS);
 
   window.data = {
     FEATURES: FEATURES,
     mainMap: mainMap,
     firstMovePin: firstMovePin,
-    apartmentOffers: apartmentOffers,
+    // apartmentOffers: apartmentOffers,
+    makeApartment: makeApartment
   };
 
 })();
