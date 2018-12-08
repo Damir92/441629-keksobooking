@@ -77,6 +77,7 @@
   // Функция, приводит страницу к первоначальному состоянию
   var resetPage = function (evt) {
     evt.preventDefault();
+    deleteCard();
 
     document.querySelector('.map__pin--main').style = 'left: 570px; top: 375px;';
     document.querySelectorAll('form').forEach(function (elem) {
@@ -90,7 +91,6 @@
     });
 
     makePageEnactive();
-    deleteCard();
     window.data.firstMovePin = true;
   };
 
