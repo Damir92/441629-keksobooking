@@ -4,16 +4,33 @@
 
   var mainMap = window.data.mainMap;
   var makePinsBlock = window.pin.makePinsBlock;
-  var apartmentOffers = window.data.apartmentOffers;
   var deleteCard = window.card.deleteCard;
   var calculatePosition = window.pin.calculatePosition;
-  var adForm = document.querySelector('.ad-form');
+  var adForm = window.form.adForm;
+  var showError = window.form.showError;
+  var load = window.backend.load;
+
+  var apartmentOffers;
 
   // Функция, активирующая карту и форму
   var makePageActive = function () {
-    if (mainMap.classList.contains('map--faded')) {
-      mainMap.classList.remove('map--faded');
-      makePinsBlock(apartmentOffers);
+    if (apartmentOffers) {
+      if (mainMap.classList.contains('map--faded')) {
+        mainMap.classList.remove('map--faded');
+        makePinsBlock(apartmentOffers);
+      }
+    } else {
+      load(function (apartments) {
+        apartmentOffers = apartments;
+        window.apartmentOffers = apartmentOffers;
+
+        if (mainMap.classList.contains('map--faded')) {
+          mainMap.classList.remove('map--faded');
+          makePinsBlock(apartmentOffers);
+        }
+      }, function (errorText) {
+        showError(errorText);
+      });
     }
 
     if (adForm.classList.contains('ad-form--disabled')) {
@@ -59,6 +76,7 @@
   // Функция, приводит страницу к первоначальному состоянию
   var resetPage = function (evt) {
     evt.preventDefault();
+    deleteCard();
 
     document.querySelector('.map__pin--main').style = 'left: 570px; top: 375px;';
     document.querySelectorAll('form').forEach(function (elem) {
@@ -72,14 +90,12 @@
     });
 
     makePageEnactive();
-    deleteCard();
     window.data.firstMovePin = true;
   };
 
   window.map = {
-    adForm: adForm,
     makePageActive: makePageActive,
-    makePageEnactive: makePageEnactive,
+    makePageEnactive: makePageEnactive
   };
 
   makePageEnactive();

@@ -1,6 +1,12 @@
 'use strict';
 
 (function () {
+  var adForm = document.querySelector('.ad-form');
+  var save = window.backend.save;
+  var calculatePosition = window.pin.calculatePosition;
+
+  var mainBlock = document.querySelector('main');
+
   // Функция, меняет ошибку при попытке отправки заголовка
   var showTitleValidityMessage = function () {
     var noticeTitle = document.querySelector('#title');
@@ -123,9 +129,45 @@
     document.querySelector('#timeout').removeEventListener('input', watchTimeOut);
   };
 
+  var showError = function (errorText) {
+    var errorElement = document.querySelector('#error').content.querySelector('.error').cloneNode(true);
+    var errorMessage = document.createElement('p');
+
+    errorMessage.textContent = errorText;
+    errorMessage.style.color = 'white';
+
+    errorElement.insertBefore(errorMessage, errorElement.querySelector('.error__button'));
+    mainBlock.appendChild(errorElement);
+  };
+
+  var showSuccess = function () {
+    var successElement = document.querySelector('#success').content.querySelector('.success').cloneNode(true);
+
+    mainBlock.appendChild(successElement);
+    setTimeout(removeSuccess, 2000);
+  };
+
+  var removeSuccess = function () {
+    mainBlock.removeChild(mainBlock.querySelector('.success'));
+  };
+
+  adForm.addEventListener('submit', function (evt) {
+    save(new FormData(adForm), function () {
+      showSuccess();
+
+      adForm.reset();
+      calculatePosition(document.querySelector('.map__pin--main'));
+    }, function (errorText) {
+      showError(errorText);
+    });
+    evt.preventDefault();
+  });
+
   window.form = {
+    adForm: adForm,
     activateForm: activateForm,
-    deactivateForm: deactivateForm
+    deactivateForm: deactivateForm,
+    showError: showError
   };
 
 })();
