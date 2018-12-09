@@ -4,12 +4,11 @@
 
   var mainMap = window.data.mainMap;
   var makePinsBlock = window.pin.makePinsBlock;
-  // var apartmentOffers = window.data.apartmentOffers;
   var deleteCard = window.card.deleteCard;
   var calculatePosition = window.pin.calculatePosition;
-  var adForm = document.querySelector('.ad-form');
+  var adForm = window.form.adForm;
+  var showError = window.form.showError;
   var load = window.backend.load;
-  var save = window.backend.save;
 
   var apartmentOffers;
 
@@ -94,33 +93,11 @@
     window.data.firstMovePin = true;
   };
 
-  var showError = function (errorText) {
-    var errorElement = document.querySelector('#error').content.querySelector('.error').cloneNode(true);
-    var errorMessage = document.createElement('p');
-
-    errorMessage.textContent = errorText;
-    errorMessage.style.color = 'white';
-
-    errorElement.insertBefore(errorMessage, errorElement.querySelector('.error__button'));
-    document.querySelector('main').appendChild(errorElement);
-  };
-
   window.map = {
-    adForm: adForm,
     makePageActive: makePageActive,
-    makePageEnactive: makePageEnactive,
+    makePageEnactive: makePageEnactive
   };
 
   makePageEnactive();
-
-  adForm.addEventListener('submit', function (evt) {
-    save(new FormData(adForm), function () {
-      adForm.reset();
-      calculatePosition(document.querySelector('.map__pin--main'));
-    }, function (errorText) {
-      showError(errorText);
-    });
-    evt.preventDefault();
-  });
 
 })();
