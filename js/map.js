@@ -10,23 +10,32 @@
   var showError = window.form.showError;
   var load = window.backend.load;
 
-  var apartmentOffers;
+  // var apartmentOffers;
+
+  var deleteEmptyOffer = function (apartments) {
+    var sortedApartments = [];
+    apartments.forEach(function (elem) {
+      if (elem.offer) {
+        sortedApartments.push(elem);
+      }
+    });
+    return sortedApartments;
+  };
 
   // Функция, активирующая карту и форму
   var makePageActive = function () {
-    if (apartmentOffers) {
+    if (window.map.apartmentOffers) {
       if (mainMap.classList.contains('map--faded')) {
         mainMap.classList.remove('map--faded');
-        makePinsBlock(apartmentOffers);
+        makePinsBlock(window.map.apartmentOffers);
       }
     } else {
       load(function (apartments) {
-        apartmentOffers = apartments;
-        window.apartmentOffers = apartmentOffers;
+        window.map.apartmentOffers = deleteEmptyOffer(apartments);
 
         if (mainMap.classList.contains('map--faded')) {
           mainMap.classList.remove('map--faded');
-          makePinsBlock(apartmentOffers);
+          makePinsBlock(window.map.apartmentOffers);
         }
       }, function (errorText) {
         showError(errorText);
@@ -47,7 +56,6 @@
 
     window.form.activateForm();
     document.querySelector('.ad-form__reset').addEventListener('click', resetPage);
-
   };
 
   // Функция, деактивирующая карту и форму
@@ -95,7 +103,8 @@
 
   window.map = {
     makePageActive: makePageActive,
-    makePageEnactive: makePageEnactive
+    makePageEnactive: makePageEnactive,
+    // apartmentOffers: apartmentOffers
   };
 
   makePageEnactive();

@@ -2,6 +2,8 @@
 
 (function () {
   var adForm = document.querySelector('.ad-form');
+  var typeApartmentMap = window.data.typeApartmentMap;
+  var capacityApartmentMap = window.data.capacityApartmentMap;
   var save = window.backend.save;
   var calculatePosition = window.pin.calculatePosition;
 
@@ -58,35 +60,21 @@
     var guests = document.querySelector('#capacity');
     guests.value = '';
 
-    if (rooms.value === '100') {
-      guests.querySelectorAll('option').forEach(function (elem) {
-        elem.disabled = (elem.value === '0') ? false : true;
-      });
-    } else {
-      guests.querySelectorAll('option').forEach(function (elem) {
-        elem.disabled = (elem.value <= rooms.value) ? false : true;
-      });
-      guests.querySelector('[value="0"]').disabled = true;
-    }
+    guests.querySelectorAll('option').forEach(function (elem) {
+      elem.disabled = true;
+    });
+
+    capacityApartmentMap[rooms.value].forEach(function (elem) {
+      guests.querySelector('[value="' + elem + '"]').disabled = false;
+    });
   };
 
   var watchTypeNotice = function () {
     var type = document.querySelector('#type');
     var price = document.querySelector('#price');
 
-    if (type.value === 'bungalo') {
-      price.min = 0;
-      price.placeholder = 0;
-    } else if (type.value === 'flat') {
-      price.min = 1000;
-      price.placeholder = 1000;
-    } else if (type.value === 'house') {
-      price.min = 5000;
-      price.placeholder = 5000;
-    } else if (type.value === 'palace') {
-      price.min = 10000;
-      price.placeholder = 10000;
-    }
+    price.min = typeApartmentMap[type.value][1];
+    price.placeholder = typeApartmentMap[type.value][1];
   };
 
   var watchTimeIn = function () {

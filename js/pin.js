@@ -40,13 +40,19 @@
   // Функция, создающая DOM-элемент с пинами объявлений на карте
   var makePinsBlock = function (apartmentArr) {
     var pinListElement = mainMap.querySelector('.map__pins');
-    var fragmentPins = document.createDocumentFragment();
 
-    apartmentArr.forEach(function (elem) {
-      if (elem.offer) {
-        fragmentPins.appendChild(renderPin(elem));
+    pinListElement.querySelectorAll('.map__pin').forEach(function (elem) {
+      if (elem.classList.contains('map__pin--main') === false) {
+        elem.remove();
       }
     });
+
+    var fragmentPins = document.createDocumentFragment();
+    var takeNumber = apartmentArr.length > 5 ? 5 : apartmentArr.length;
+
+    for (var i = 0; i < takeNumber; i++) {
+      fragmentPins.appendChild(renderPin(apartmentArr[i]));
+    }
     pinListElement.appendChild(fragmentPins);
   };
 
