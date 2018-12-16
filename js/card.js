@@ -3,7 +3,7 @@
 (function () {
   var ESC_KEYCODE = 27;
   var FEATURES = window.data.FEATURES;
-
+  var typeApartmentMap = window.data.typeApartmentMap;
   var mainMap = window.data.mainMap;
 
   // Функция, удаляющая старую карточку
@@ -24,19 +24,6 @@
     }
   };
 
-  // Возвращает тип жилья
-  var chooseTypeApartment = function (apartment) {
-    if (apartment.offer.type === 'flat') {
-      return 'Квартира';
-    } else if (apartment.offer.type === 'bungalo') {
-      return 'Бунгало';
-    } else if (apartment.offer.type === 'house') {
-      return 'Дом';
-    } else {
-      return 'Дворец';
-    }
-  };
-
   // Функция, наполняющая DOM-элемент по шаблону
   var renderCard = function (apartment) {
     var cardElement = document.querySelector('#card').content.querySelector('.map__card').cloneNode(true);
@@ -45,7 +32,7 @@
     cardElement.querySelector('.popup__title').textContent = apartment.offer.title;
     cardElement.querySelector('.popup__text--address').textContent = apartment.offer.address;
     cardElement.querySelector('.popup__text--price').textContent = apartment.offer.price + '₽/ночь';
-    cardElement.querySelector('.popup__type').textContent = chooseTypeApartment(apartment);
+    cardElement.querySelector('.popup__type').textContent = typeApartmentMap[apartment.offer.type][0];
     cardElement.querySelector('.popup__text--capacity').textContent = apartment.offer.rooms + ' комнаты для ' + apartment.offer.guests + ' гостей';
     cardElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + apartment.offer.checkin + ', выезд до ' + apartment.offer.checkout;
 
