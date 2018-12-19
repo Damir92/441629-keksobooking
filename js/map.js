@@ -100,6 +100,12 @@
       }
     });
 
+    document.querySelector('.ad-form-header__preview img').src = 'img/muffin-grey.svg';
+
+    document.querySelectorAll('.ad-form__photo img').forEach(function (elem) {
+      elem.parentNode.remove();
+    });
+
     makePageEnactive();
     window.data.firstMovePin = true;
   };
