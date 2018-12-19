@@ -6,11 +6,10 @@
   var makePinsBlock = window.pin.makePinsBlock;
   var deleteCard = window.card.deleteCard;
   var calculatePosition = window.pin.calculatePosition;
-  var adForm = window.form.adForm;
   var showError = window.form.showError;
   var load = window.backend.load;
 
-  // var apartmentOffers;
+  var adForm = document.querySelector('.ad-form');
 
   var deleteEmptyOffer = function (apartments) {
     var sortedApartments = [];
@@ -55,7 +54,7 @@
     });
 
     window.form.activateForm();
-    document.querySelector('.ad-form__reset').addEventListener('click', resetPage);
+    document.querySelector('.ad-form__reset').addEventListener('click', onResetClick);
   };
 
   // Функция, деактивирующая карту и форму
@@ -78,12 +77,16 @@
 
     calculatePosition(document.querySelector('.map__pin--main'));
     window.form.deactivateForm();
-    document.querySelector('.ad-form__reset').removeEventListener('click', resetPage);
+    document.querySelector('.ad-form__reset').removeEventListener('click', onResetClick);
+  };
+
+  var onResetClick = function (evt) {
+    evt.preventDefault();
+    resetPage();
   };
 
   // Функция, приводит страницу к первоначальному состоянию
-  var resetPage = function (evt) {
-    evt.preventDefault();
+  var resetPage = function () {
     deleteCard();
 
     document.querySelector('.map__pin--main').style = 'left: 570px; top: 375px;';
@@ -97,6 +100,12 @@
       }
     });
 
+    document.querySelector('.ad-form-header__preview img').src = 'img/muffin-grey.svg';
+
+    document.querySelectorAll('.ad-form__photo img').forEach(function (elem) {
+      elem.parentNode.remove();
+    });
+
     makePageEnactive();
     window.data.firstMovePin = true;
   };
@@ -104,7 +113,8 @@
   window.map = {
     makePageActive: makePageActive,
     makePageEnactive: makePageEnactive,
-    // apartmentOffers: apartmentOffers
+    adForm: adForm,
+    resetPage: resetPage
   };
 
   makePageEnactive();

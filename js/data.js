@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var ESC_KEYCODE = 27;
 
   var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 
@@ -22,6 +23,7 @@
   var mainMap = document.querySelector('.map');
 
   window.data = {
+    ESC_KEYCODE: ESC_KEYCODE,
     FEATURES: FEATURES,
     mainMap: mainMap,
     firstMovePin: firstMovePin,
