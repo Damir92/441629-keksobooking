@@ -29,7 +29,7 @@
   var fileChooserPhotos = photosContainer.querySelector('#images');
 
   fileChooserPhotos.addEventListener('change', function () {
-    var reader = [];
+    var readers = [];
 
     for (var i = 0; i < fileChooserPhotos.files.length; i++) {
 
@@ -41,16 +41,16 @@
       });
 
       if (matches) {
-        reader[i] = new FileReader();
+        readers[i] = new FileReader();
 
-        reader[i].addEventListener('load', addPreviewPhoto);
+        readers[i].addEventListener('load', onPhotoChooserLoad);
 
-        reader[i].readAsDataURL(file);
+        readers[i].readAsDataURL(file);
       }
     }
   });
 
-  var addPreviewPhoto = function (evt) {
+  var onPhotoChooserLoad = function (evt) {
     var previewPhotos = photosContainer.querySelectorAll('.ad-form__photo');
     var previewImg = document.createElement('img');
     previewImg.src = evt.target.result;

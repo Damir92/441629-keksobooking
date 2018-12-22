@@ -4,7 +4,7 @@
 
   var mainMap = window.data.mainMap;
   var makePinsBlock = window.pin.makePinsBlock;
-  var deleteCard = window.card.deleteCard;
+  var deleteCard = window.card.deleteBlock;
   var calculatePosition = window.pin.calculatePosition;
   var showError = window.form.showError;
   var load = window.backend.load;
@@ -53,7 +53,7 @@
       elem.disabled = false;
     });
 
-    window.form.activateForm();
+    window.form.activate();
     document.querySelector('.ad-form__reset').addEventListener('click', onResetClick);
   };
 
@@ -76,7 +76,7 @@
     });
 
     calculatePosition(document.querySelector('.map__pin--main'));
-    window.form.deactivateForm();
+    window.form.deactivate();
     document.querySelector('.ad-form__reset').removeEventListener('click', onResetClick);
   };
 
