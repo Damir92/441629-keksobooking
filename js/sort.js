@@ -9,43 +9,53 @@
   };
 
   var makePinsBlock = window.pin.makePinsBlock;
-  var deleteCard = window.card.deleteCard;
+  var deleteCard = window.card.deleteBlock;
   var filters = document.querySelector('.map__filters');
+
+  var sortByPrice = function (elem) {
+    return ((wish.price === 'any') ||
+      (elem.offer.price >= priceMap[wish.price][0] &&
+        elem.offer.price < priceMap[wish.price][1]));
+  };
+
+  var sortByType = function (elem) {
+    return (wish.type === 'any' ||
+      elem.offer.type === wish.type);
+  };
+
+  var sortByRooms = function (elem) {
+    return (wish.rooms === 'any' ||
+      elem.offer.rooms === parseInt(wish.rooms, 10));
+  };
+
+  var sortByGuests = function (elem) {
+    return (wish.guests === 'any' ||
+      elem.offer.guests === parseInt(wish.guests, 10));
+  };
+
+  var sortByFeatures = function (elem) {
+    var result = true;
+    wish.features.forEach(function (feature) {
+      if (elem.offer.features.indexOf(feature) === -1) {
+        result = false;
+      }
+    });
+    return result;
+  };
 
   var updateOffers = window.debounce(function () {
     var sortedOffers = [];
     deleteCard();
 
     window.map.apartmentOffers.forEach(function (elem) {
-      if (elem.offer.type === wish.type || wish.type === 'any') {
+      if (sortByType(elem) &&
+        sortByPrice(elem) &&
+        sortByRooms(elem) &&
+        sortByGuests(elem) &&
+        sortByFeatures(elem)) {
         sortedOffers.push(elem);
       }
     });
-
-    if (wish.price !== 'any') {
-      sortedOffers = sortedOffers.filter(function (elem) {
-        return (elem.offer.price >= priceMap[wish.price][0] && elem.offer.price < priceMap[wish.price][1]);
-      });
-    }
-
-    if (wish.rooms !== 'any') {
-      sortedOffers = sortedOffers.filter(function (elem) {
-        return (elem.offer.rooms === parseInt(wish.rooms, 10));
-      });
-    }
-
-    if (wish.guests !== 'any') {
-      sortedOffers = sortedOffers.filter(function (elem) {
-        return (elem.offer.guests === parseInt(wish.guests, 10));
-      });
-    }
-
-    for (var i = 0; i < wish.features.length; i++) {
-      sortedOffers = sortedOffers.filter(function (elem) {
-        return (elem.offer.features.includes(wish.features[i]));
-      });
-    }
-
 
     makePinsBlock(sortedOffers);
   });
@@ -86,14 +96,12 @@
   wishFeatures.addEventListener('change', function () {
     var checkedFeatures = [];
     wishFeatures.querySelectorAll('.map__checkbox').forEach(function (elem) {
-      if (elem.checked === true) {
+      if (elem.checked) {
         checkedFeatures.push(elem.value);
       }
     });
     wish.features = checkedFeatures;
     updateOffers();
   });
-
-  window.wish = wish;
 
 })();

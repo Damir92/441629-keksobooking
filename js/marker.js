@@ -32,8 +32,6 @@
 
   // Функция отслеживания пина
   var addHandlerToMainPin = function () {
-    var mainPin = document.querySelector('.map__pin--main');
-
     var TOP = 130;
     var BOTTOM = 630;
     var LEFT = 0;
@@ -41,13 +39,15 @@
     var HALF_WIDTH_MAIN_PIN = 31;
     var HEIGHT_PIN = 84;
 
+    var mainPin = document.querySelector('.map__pin--main');
+
     mainPin.addEventListener('mousedown', function (evt) {
       evt.preventDefault();
 
       var tempLeft = 0;
       var tempTop = 0;
-      var resultX = [];
-      var resultY = [];
+      var resultsX = [];
+      var resultsY = [];
 
       if (window.data.firstMovePin) {
         makePageActive();
@@ -73,14 +73,14 @@
         };
 
         // Рассчет передвижения маркера по-горизонтали, с учетом границ
-        resultX = moveMarker(mainPin.offsetLeft, shift.x, tempLeft, LEFT, RIGHT, HALF_WIDTH_MAIN_PIN);
-        mainPin.style.left = resultX[0];
-        tempLeft = resultX[1];
+        resultsX = moveMarker(mainPin.offsetLeft, shift.x, tempLeft, LEFT, RIGHT, HALF_WIDTH_MAIN_PIN);
+        mainPin.style.left = resultsX[0];
+        tempLeft = resultsX[1];
 
         // Рассчет передвижения маркера по-вертикали, с учетом границ
-        resultY = moveMarker(mainPin.offsetTop, shift.y, tempTop, TOP, BOTTOM, HEIGHT_PIN);
-        mainPin.style.top = resultY[0];
-        tempTop = resultY[1];
+        resultsY = moveMarker(mainPin.offsetTop, shift.y, tempTop, TOP, BOTTOM, HEIGHT_PIN);
+        mainPin.style.top = resultsY[0];
+        tempTop = resultsY[1];
 
         calculatePosition(mainPin);
       };

@@ -4,10 +4,12 @@
 
   var typeApartmentMap = window.data.typeApartmentMap;
   var capacityApartmentMap = window.data.capacityApartmentMap;
+  var adForm = window.pin.adForm;
+  var filterForm = document.querySelector('.map__filters');
 
   // Функция, меняет ошибку при попытке отправки заголовка
-  var showTitleValidityMessage = function () {
-    var noticeTitle = document.querySelector('#title');
+  var onTitleInvalid = function () {
+    var noticeTitle = adForm.querySelector('#title');
     if (noticeTitle.validity.tooShort) {
       noticeTitle.setCustomValidity('Заголовок должен содержать не менее 30-ти символов');
     } else if (noticeTitle.validity.tooLong) {
@@ -20,7 +22,7 @@
   };
 
   // Функция, выводит ошибку при наборе заголовка
-  var changeTitleValidityMessage = function (evt) {
+  var onTitleInput = function (evt) {
     var target = evt.target;
     if (target.value.length < 30) {
       target.setCustomValidity('Заголовок должен содержать не менее 30-ти символов! Сейчас символов: ' + target.value.length);
@@ -29,10 +31,10 @@
     }
   };
 
-  var showPriceValidityMessage = function () {
-    var noticePrice = document.querySelector('#price');
+  var onPriceInvalid = function () {
+    var noticePrice = adForm.querySelector('#price');
     if (noticePrice.validity.rangeUnderflow) {
-      noticePrice.setCustomValidity('Минимальная стоимость: ' + document.querySelector('#price').min);
+      noticePrice.setCustomValidity('Минимальная стоимость: ' + noticePrice.min);
     } else if (noticePrice.validity.rangeOverflow) {
       noticePrice.setCustomValidity('Кажется, у Вас в стоимости многовато цифр! Максимальная стоимость 1 000 000');
     } else if (noticePrice.validity.valueMissing) {
@@ -42,7 +44,7 @@
     }
   };
 
-  var changePriceValidityMessage = function (evt) {
+  var onPriceInput = function (evt) {
     var target = evt.target;
     if (target.value < 1000) {
       target.setCustomValidity('Настолько дешёвого жилья не бывает! Накиньте еще ' + (1000 - target.value));
@@ -51,9 +53,30 @@
     }
   };
 
-  var changeRoomsBlock = function () {
-    var rooms = document.querySelector('#room_number');
-    var guests = document.querySelector('#capacity');
+  var onRoomNumberInput = function () {
+    var rooms = adForm.querySelector('#room_number');
+    var guests = adForm.querySelector('#capacity');
+
+    changeGuestsInRooms(rooms, guests);
+  };
+
+  // Если я правильно понял замечание к критерию Б1, то это для него
+  var onFilterRoomNumberInput = function () {
+    var rooms = filterForm.querySelector('#housing-rooms');
+    var guests = filterForm.querySelector('#housing-guests');
+
+    if (rooms.value === '3' || rooms.value === 'any') {
+      guests.querySelectorAll('option').forEach(function (elem) {
+        elem.disabled = false;
+      });
+    } else {
+      changeGuestsInRooms(rooms, guests);
+      guests.querySelector('[value="any"]').disabled = false;
+    }
+    guests.querySelector('[value="any"]').selected = true;
+  };
+
+  var changeGuestsInRooms = function (rooms, guests) {
     guests.value = '';
 
     guests.querySelectorAll('option').forEach(function (elem) {
@@ -65,57 +88,58 @@
     });
   };
 
-  var watchTypeNotice = function () {
-    var type = document.querySelector('#type');
-    var price = document.querySelector('#price');
+  var onTypeInput = function () {
+    var type = adForm.querySelector('#type');
+    var price = adForm.querySelector('#price');
 
     price.min = typeApartmentMap[type.value][1];
     price.placeholder = typeApartmentMap[type.value][1];
   };
 
-  var watchTimeIn = function () {
-    var timeIn = document.querySelector('#timein');
-    var timeOut = document.querySelector('#timeout');
+  var onTimeInInput = function () {
+    var timeIn = adForm.querySelector('#timein');
+    var timeOut = adForm.querySelector('#timeout');
 
     if (timeIn.value) {
       timeOut.value = timeIn.value;
     }
   };
 
-  var watchTimeOut = function () {
-    var timeIn = document.querySelector('#timein');
-    var timeOut = document.querySelector('#timeout');
+  var onTimeOutInput = function () {
+    var timeIn = adForm.querySelector('#timein');
+    var timeOut = adForm.querySelector('#timeout');
 
     if (timeOut.value) {
       timeIn.value = timeOut.value;
     }
   };
 
-  var activateForm = function () {
-    document.querySelector('#title').addEventListener('invalid', showTitleValidityMessage);
-    document.querySelector('#title').addEventListener('input', changeTitleValidityMessage);
-    document.querySelector('#price').addEventListener('invalid', showPriceValidityMessage);
-    document.querySelector('#price').addEventListener('input', changePriceValidityMessage);
-    document.querySelector('#room_number').addEventListener('input', changeRoomsBlock);
-    document.querySelector('#type').addEventListener('input', watchTypeNotice);
-    document.querySelector('#timein').addEventListener('input', watchTimeIn);
-    document.querySelector('#timeout').addEventListener('input', watchTimeOut);
+  var activate = function () {
+    adForm.querySelector('#title').addEventListener('invalid', onTitleInvalid);
+    adForm.querySelector('#title').addEventListener('input', onTitleInput);
+    adForm.querySelector('#price').addEventListener('invalid', onPriceInvalid);
+    adForm.querySelector('#price').addEventListener('input', onPriceInput);
+    adForm.querySelector('#room_number').addEventListener('input', onRoomNumberInput);
+    adForm.querySelector('#type').addEventListener('input', onTypeInput);
+    adForm.querySelector('#timein').addEventListener('input', onTimeInInput);
+    adForm.querySelector('#timeout').addEventListener('input', onTimeOutInput);
+    filterForm.querySelector('#housing-rooms').addEventListener('input', onFilterRoomNumberInput);
   };
 
-  var deactivateForm = function () {
-    document.querySelector('#title').removeEventListener('invalid', showTitleValidityMessage);
-    document.querySelector('#title').removeEventListener('input', changeTitleValidityMessage);
-    document.querySelector('#price').removeEventListener('invalid', showPriceValidityMessage);
-    document.querySelector('#price').removeEventListener('input', changePriceValidityMessage);
-    document.querySelector('#room_number').removeEventListener('input', changeRoomsBlock);
-    document.querySelector('#type').removeEventListener('input', watchTypeNotice);
-    document.querySelector('#timein').removeEventListener('input', watchTimeIn);
-    document.querySelector('#timeout').removeEventListener('input', watchTimeOut);
+  var deactivate = function () {
+    adForm.querySelector('#title').removeEventListener('invalid', onTitleInvalid);
+    adForm.querySelector('#title').removeEventListener('input', onTitleInput);
+    adForm.querySelector('#price').removeEventListener('invalid', onPriceInvalid);
+    adForm.querySelector('#price').removeEventListener('input', onPriceInput);
+    adForm.querySelector('#room_number').removeEventListener('input', onRoomNumberInput);
+    adForm.querySelector('#type').removeEventListener('input', onTypeInput);
+    adForm.querySelector('#timein').removeEventListener('input', onTimeInInput);
+    adForm.querySelector('#timeout').removeEventListener('input', onTimeOutInput);
   };
 
   window.form = {
-    activateForm: activateForm,
-    deactivateForm: deactivateForm
+    activate: activate,
+    deactivate: deactivate
   };
 
 })();

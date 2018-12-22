@@ -20,15 +20,23 @@
     errorElement.insertBefore(errorMessage, errorElement.querySelector('.error__button'));
     mainBlock.appendChild(errorElement);
 
-    window.addEventListener('click', removeError);
+    window.addEventListener('click', onErrorWindowClick);
     window.addEventListener('keydown', onMessageEscPress);
   };
 
   var removeError = function () {
-    window.removeEventListener('click', removeError);
+    window.removeEventListener('click', onErrorWindowClick);
     window.removeEventListener('keydown', onMessageEscPress);
 
     mainBlock.removeChild(mainBlock.querySelector('.error'));
+  };
+
+  var onErrorWindowClick = function () {
+    removeError();
+  };
+
+  var onSuccessWindowClick = function () {
+    removeSuccess();
   };
 
   var onMessageEscPress = function (evt) {
@@ -47,13 +55,12 @@
     resetPage();
     mainBlock.appendChild(successElement);
 
-    window.addEventListener('click', removeSuccess);
+    window.addEventListener('click', onSuccessWindowClick);
     window.addEventListener('keydown', onMessageEscPress);
-    // setTimeout(removeSuccess, 2000);
   };
 
   var removeSuccess = function () {
-    window.removeEventListener('click', removeSuccess);
+    window.removeEventListener('click', onSuccessWindowClick);
     window.removeEventListener('keydown', onMessageEscPress);
 
     mainBlock.removeChild(mainBlock.querySelector('.success'));
