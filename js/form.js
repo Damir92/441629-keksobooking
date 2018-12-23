@@ -6,6 +6,9 @@
   var capacityApartmentMap = window.data.capacityApartmentMap;
   var adForm = window.pin.adForm;
   var filterForm = document.querySelector('.map__filters');
+  var noticePrice = adForm.querySelector('#price');
+  var rooms = adForm.querySelector('#room_number');
+  var guests = adForm.querySelector('#capacity');
 
   // Функция, меняет ошибку при попытке отправки заголовка
   var onTitleInvalid = function () {
@@ -32,7 +35,6 @@
   };
 
   var onPriceInvalid = function () {
-    var noticePrice = adForm.querySelector('#price');
     if (noticePrice.validity.rangeUnderflow) {
       noticePrice.setCustomValidity('Минимальная стоимость: ' + noticePrice.min);
     } else if (noticePrice.validity.rangeOverflow) {
@@ -46,47 +48,39 @@
 
   var onPriceInput = function (evt) {
     var target = evt.target;
-    if (target.value < 1000) {
-      target.setCustomValidity('Настолько дешёвого жилья не бывает! Накиньте еще ' + (1000 - target.value));
+    if (target.value < noticePrice.min) {
+      target.setCustomValidity('Настолько дешёвого жилья не бывает! Добавьте еще ' + (noticePrice.min - target.value));
     } else {
       target.setCustomValidity('');
     }
   };
 
   var onRoomNumberInput = function () {
-    var rooms = adForm.querySelector('#room_number');
-    var guests = adForm.querySelector('#capacity');
-
     changeGuestsInRooms(rooms, guests);
-  };
-
-  // Если я правильно понял замечание к критерию Б1, то это для него
-  var onFilterRoomNumberInput = function () {
-    var rooms = filterForm.querySelector('#housing-rooms');
-    var guests = filterForm.querySelector('#housing-guests');
-
-    if (rooms.value === '3' || rooms.value === 'any') {
-      guests.querySelectorAll('option').forEach(function (elem) {
-        elem.disabled = false;
-      });
-    } else {
-      changeGuestsInRooms(rooms, guests);
-      guests.querySelector('[value="any"]').disabled = false;
-    }
-    guests.querySelector('[value="any"]').selected = true;
   };
 
   var changeGuestsInRooms = function (rooms, guests) {
     guests.value = '';
 
     guests.querySelectorAll('option').forEach(function (elem) {
-      elem.disabled = true;
+      elem.style.display = 'none';
     });
 
     capacityApartmentMap[rooms.value].forEach(function (elem) {
-      guests.querySelector('[value="' + elem + '"]').disabled = false;
+      guests.querySelector('[value="' + elem + '"]').style.display = 'block';
     });
   };
+
+  // var validateGuests = function () {
+  //   // var result = true;
+  //   if (capacityApartmentMap[rooms.value].indexOf(guests.value) === -1) {
+  //     guests.setCustomValidity('Bad');
+  //     guests.value = ''
+  //     return false;
+  //   }
+  //   console.log(capacityApartmentMap[rooms.value], guests.value);
+  //   return true;
+  // }
 
   var onTypeInput = function () {
     var type = adForm.querySelector('#type');
@@ -123,7 +117,6 @@
     adForm.querySelector('#type').addEventListener('input', onTypeInput);
     adForm.querySelector('#timein').addEventListener('input', onTimeInInput);
     adForm.querySelector('#timeout').addEventListener('input', onTimeOutInput);
-    filterForm.querySelector('#housing-rooms').addEventListener('input', onFilterRoomNumberInput);
   };
 
   var deactivate = function () {
