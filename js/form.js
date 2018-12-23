@@ -5,10 +5,7 @@
   var typeApartmentMap = window.data.typeApartmentMap;
   var capacityApartmentMap = window.data.capacityApartmentMap;
   var adForm = window.pin.adForm;
-  var filterForm = document.querySelector('.map__filters');
   var noticePrice = adForm.querySelector('#price');
-  var rooms = adForm.querySelector('#room_number');
-  var guests = adForm.querySelector('#capacity');
 
   // Функция, меняет ошибку при попытке отправки заголовка
   var onTitleInvalid = function () {
@@ -56,6 +53,9 @@
   };
 
   var onRoomNumberInput = function () {
+    var rooms = adForm.querySelector('#room_number');
+    var guests = adForm.querySelector('#capacity');
+
     changeGuestsInRooms(rooms, guests);
   };
 
@@ -70,17 +70,6 @@
       guests.querySelector('[value="' + elem + '"]').style.display = 'block';
     });
   };
-
-  // var validateGuests = function () {
-  //   // var result = true;
-  //   if (capacityApartmentMap[rooms.value].indexOf(guests.value) === -1) {
-  //     guests.setCustomValidity('Bad');
-  //     guests.value = ''
-  //     return false;
-  //   }
-  //   console.log(capacityApartmentMap[rooms.value], guests.value);
-  //   return true;
-  // }
 
   var onTypeInput = function () {
     var type = adForm.querySelector('#type');

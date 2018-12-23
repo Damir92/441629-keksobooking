@@ -8,7 +8,6 @@
   var HALF_WIDTH_MAIN_PIN = 31;
   var HEIGHT_PIN = 84;
 
-  var mainMap = window.data.mainMap;
   var makePageActive = window.map.makePageActive;
   var calculatePosition = window.pin.calculatePosition;
 
