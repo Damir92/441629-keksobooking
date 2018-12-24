@@ -6,6 +6,8 @@
   var capacityApartmentMap = window.data.capacityApartmentMap;
   var adForm = window.pin.adForm;
   var noticePrice = adForm.querySelector('#price');
+  var rooms = adForm.querySelector('#room_number');
+  var guests = adForm.querySelector('#capacity');
 
   // Функция, меняет ошибку при попытке отправки заголовка
   var onTitleInvalid = function () {
@@ -31,6 +33,7 @@
     }
   };
 
+  // Функция, меняет ошибку при неверное стоимости
   var onPriceInvalid = function () {
     if (noticePrice.validity.rangeUnderflow) {
       noticePrice.setCustomValidity('Минимальная стоимость: ' + noticePrice.min);
@@ -43,6 +46,7 @@
     }
   };
 
+  // Функция, выводит ошибку при наборе цены
   var onPriceInput = function (evt) {
     var target = evt.target;
     if (target.value < noticePrice.min) {
@@ -53,22 +57,35 @@
   };
 
   var onRoomNumberInput = function () {
-    var rooms = adForm.querySelector('#room_number');
-    var guests = adForm.querySelector('#capacity');
-
-    changeGuestsInRooms(rooms, guests);
+    changeGuestsInRooms();
+    validateGuestsNumber();
   };
 
-  var changeGuestsInRooms = function (rooms, guests) {
-    guests.value = '';
+  var onGuestsNumberInput = function () {
+    validateGuestsNumber();
+  };
 
+  var changeGuestsInRooms = function () {
     guests.querySelectorAll('option').forEach(function (elem) {
-      elem.style.display = 'none';
+      elem.disabled = true;
     });
 
     capacityApartmentMap[rooms.value].forEach(function (elem) {
-      guests.querySelector('[value="' + elem + '"]').style.display = 'block';
+      guests.querySelector('[value="' + elem + '"]').disabled = false;
     });
+  };
+
+  var validateGuestsNumber = function () {
+    var result = true;
+    if (capacityApartmentMap[rooms.value].indexOf(guests.value) === -1) {
+      result = false;
+    }
+
+    if (result) {
+      guests.setCustomValidity('');
+    } else {
+      guests.setCustomValidity('Введите допустимое количество гостей!');
+    }
   };
 
   var onTypeInput = function () {
@@ -100,23 +117,27 @@
   var activate = function () {
     adForm.querySelector('#title').addEventListener('invalid', onTitleInvalid);
     adForm.querySelector('#title').addEventListener('input', onTitleInput);
-    adForm.querySelector('#price').addEventListener('invalid', onPriceInvalid);
-    adForm.querySelector('#price').addEventListener('input', onPriceInput);
-    adForm.querySelector('#room_number').addEventListener('input', onRoomNumberInput);
     adForm.querySelector('#type').addEventListener('input', onTypeInput);
     adForm.querySelector('#timein').addEventListener('input', onTimeInInput);
     adForm.querySelector('#timeout').addEventListener('input', onTimeOutInput);
+    noticePrice.addEventListener('invalid', onPriceInvalid);
+    noticePrice.addEventListener('input', onPriceInput);
+    rooms.addEventListener('input', onRoomNumberInput);
+    guests.addEventListener('input', onGuestsNumberInput);
+    changeGuestsInRooms();
+    validateGuestsNumber();
   };
 
   var deactivate = function () {
     adForm.querySelector('#title').removeEventListener('invalid', onTitleInvalid);
     adForm.querySelector('#title').removeEventListener('input', onTitleInput);
-    adForm.querySelector('#price').removeEventListener('invalid', onPriceInvalid);
-    adForm.querySelector('#price').removeEventListener('input', onPriceInput);
-    adForm.querySelector('#room_number').removeEventListener('input', onRoomNumberInput);
     adForm.querySelector('#type').removeEventListener('input', onTypeInput);
     adForm.querySelector('#timein').removeEventListener('input', onTimeInInput);
     adForm.querySelector('#timeout').removeEventListener('input', onTimeOutInput);
+    noticePrice.removeEventListener('invalid', onPriceInvalid);
+    noticePrice.removeEventListener('input', onPriceInput);
+    rooms.removeEventListener('input', onRoomNumberInput);
+    guests.removeEventListener('input', onGuestsNumberInput);
   };
 
   window.form = {
