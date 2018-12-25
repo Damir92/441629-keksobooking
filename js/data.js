@@ -2,7 +2,6 @@
 
 (function () {
   var ESC_KEYCODE = 27;
-
   var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 
   var typeApartmentMap = {

@@ -1,7 +1,13 @@
 'use strict';
 
 (function () {
-  var mainMap = window.data.mainMap;
+  var TOP = 130;
+  var BOTTOM = 630;
+  var LEFT = 0;
+  var RIGHT = 1200;
+  var HALF_WIDTH_MAIN_PIN = 31;
+  var HEIGHT_PIN = 84;
+
   var makePageActive = window.map.makePageActive;
   var calculatePosition = window.pin.calculatePosition;
 
@@ -32,13 +38,6 @@
 
   // Функция отслеживания пина
   var addHandlerToMainPin = function () {
-    var TOP = 130;
-    var BOTTOM = 630;
-    var LEFT = 0;
-    var RIGHT = mainMap.offsetWidth;
-    var HALF_WIDTH_MAIN_PIN = 31;
-    var HEIGHT_PIN = 84;
-
     var mainPin = document.querySelector('.map__pin--main');
 
     mainPin.addEventListener('mousedown', function (evt) {

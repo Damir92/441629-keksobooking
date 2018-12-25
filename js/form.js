@@ -5,7 +5,9 @@
   var typeApartmentMap = window.data.typeApartmentMap;
   var capacityApartmentMap = window.data.capacityApartmentMap;
   var adForm = window.pin.adForm;
-  var filterForm = document.querySelector('.map__filters');
+  var noticePrice = adForm.querySelector('#price');
+  var rooms = adForm.querySelector('#room_number');
+  var guests = adForm.querySelector('#capacity');
 
   // Функция, меняет ошибку при попытке отправки заголовка
   var onTitleInvalid = function () {
@@ -31,8 +33,8 @@
     }
   };
 
+  // Функция, меняет ошибку при неверное стоимости
   var onPriceInvalid = function () {
-    var noticePrice = adForm.querySelector('#price');
     if (noticePrice.validity.rangeUnderflow) {
       noticePrice.setCustomValidity('Минимальная стоимость: ' + noticePrice.min);
     } else if (noticePrice.validity.rangeOverflow) {
@@ -44,41 +46,26 @@
     }
   };
 
+  // Функция, выводит ошибку при наборе цены
   var onPriceInput = function (evt) {
     var target = evt.target;
-    if (target.value < 1000) {
-      target.setCustomValidity('Настолько дешёвого жилья не бывает! Накиньте еще ' + (1000 - target.value));
+    if (target.value < noticePrice.min) {
+      target.setCustomValidity('Настолько дешёвого жилья не бывает! Добавьте еще ' + (noticePrice.min - target.value));
     } else {
       target.setCustomValidity('');
     }
   };
 
   var onRoomNumberInput = function () {
-    var rooms = adForm.querySelector('#room_number');
-    var guests = adForm.querySelector('#capacity');
-
-    changeGuestsInRooms(rooms, guests);
+    changeGuestsInRooms();
+    validateGuestsNumber();
   };
 
-  // Если я правильно понял замечание к критерию Б1, то это для него
-  var onFilterRoomNumberInput = function () {
-    var rooms = filterForm.querySelector('#housing-rooms');
-    var guests = filterForm.querySelector('#housing-guests');
-
-    if (rooms.value === '3' || rooms.value === 'any') {
-      guests.querySelectorAll('option').forEach(function (elem) {
-        elem.disabled = false;
-      });
-    } else {
-      changeGuestsInRooms(rooms, guests);
-      guests.querySelector('[value="any"]').disabled = false;
-    }
-    guests.querySelector('[value="any"]').selected = true;
+  var onGuestsNumberInput = function () {
+    validateGuestsNumber();
   };
 
-  var changeGuestsInRooms = function (rooms, guests) {
-    guests.value = '';
-
+  var changeGuestsInRooms = function () {
     guests.querySelectorAll('option').forEach(function (elem) {
       elem.disabled = true;
     });
@@ -86,6 +73,19 @@
     capacityApartmentMap[rooms.value].forEach(function (elem) {
       guests.querySelector('[value="' + elem + '"]').disabled = false;
     });
+  };
+
+  var validateGuestsNumber = function () {
+    var result = true;
+    if (capacityApartmentMap[rooms.value].indexOf(guests.value) === -1) {
+      result = false;
+    }
+
+    if (result) {
+      guests.setCustomValidity('');
+    } else {
+      guests.setCustomValidity('Введите допустимое количество гостей!');
+    }
   };
 
   var onTypeInput = function () {
@@ -117,24 +117,27 @@
   var activate = function () {
     adForm.querySelector('#title').addEventListener('invalid', onTitleInvalid);
     adForm.querySelector('#title').addEventListener('input', onTitleInput);
-    adForm.querySelector('#price').addEventListener('invalid', onPriceInvalid);
-    adForm.querySelector('#price').addEventListener('input', onPriceInput);
-    adForm.querySelector('#room_number').addEventListener('input', onRoomNumberInput);
     adForm.querySelector('#type').addEventListener('input', onTypeInput);
     adForm.querySelector('#timein').addEventListener('input', onTimeInInput);
     adForm.querySelector('#timeout').addEventListener('input', onTimeOutInput);
-    filterForm.querySelector('#housing-rooms').addEventListener('input', onFilterRoomNumberInput);
+    noticePrice.addEventListener('invalid', onPriceInvalid);
+    noticePrice.addEventListener('input', onPriceInput);
+    rooms.addEventListener('input', onRoomNumberInput);
+    guests.addEventListener('input', onGuestsNumberInput);
+    changeGuestsInRooms();
+    validateGuestsNumber();
   };
 
   var deactivate = function () {
     adForm.querySelector('#title').removeEventListener('invalid', onTitleInvalid);
     adForm.querySelector('#title').removeEventListener('input', onTitleInput);
-    adForm.querySelector('#price').removeEventListener('invalid', onPriceInvalid);
-    adForm.querySelector('#price').removeEventListener('input', onPriceInput);
-    adForm.querySelector('#room_number').removeEventListener('input', onRoomNumberInput);
     adForm.querySelector('#type').removeEventListener('input', onTypeInput);
     adForm.querySelector('#timein').removeEventListener('input', onTimeInInput);
     adForm.querySelector('#timeout').removeEventListener('input', onTimeOutInput);
+    noticePrice.removeEventListener('invalid', onPriceInvalid);
+    noticePrice.removeEventListener('input', onPriceInput);
+    rooms.removeEventListener('input', onRoomNumberInput);
+    guests.removeEventListener('input', onGuestsNumberInput);
   };
 
   window.form = {
